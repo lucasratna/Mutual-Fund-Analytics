@@ -1,5 +1,49 @@
--- Database Schema
+CREATE TABLE dim_fund (
+    amfi_code INTEGER PRIMARY KEY,
+    fund_house TEXT,
+    scheme_name TEXT,
+    category TEXT,
+    sub_category TEXT,
+    risk_category TEXT
+);
 
-SELECT name
-FROM sqlite_master
-WHERE type='table';
+CREATE TABLE dim_date (
+    date_id INTEGER PRIMARY KEY,
+    full_date DATE
+);
+
+CREATE TABLE fact_nav (
+    nav_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amfi_code INTEGER,
+    date_id INTEGER,
+    nav REAL,
+    FOREIGN KEY(amfi_code) REFERENCES dim_fund(amfi_code),
+    FOREIGN KEY(date_id) REFERENCES dim_date(date_id)
+);
+
+CREATE TABLE fact_transactions (
+    transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amfi_code INTEGER,
+    transaction_date DATE,
+    transaction_type TEXT,
+    amount_inr REAL,
+    FOREIGN KEY(amfi_code) REFERENCES dim_fund(amfi_code)
+);
+
+CREATE TABLE fact_performance (
+    perf_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amfi_code INTEGER,
+    return_1yr_pct REAL,
+    return_3yr_pct REAL,
+    return_5yr_pct REAL,
+    sharpe_ratio REAL,
+    expense_ratio_pct REAL,
+    FOREIGN KEY(amfi_code) REFERENCES dim_fund(amfi_code)
+);
+
+CREATE TABLE fact_aum (
+    aum_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fund_house TEXT,
+    aum_crore REAL,
+    num_schemes INTEGER
+);

@@ -1,21 +1,18 @@
 import sqlite3
-
-print("SCRIPT UPDATED VERSION RUNNING")
+import pandas as pd
 
 conn = sqlite3.connect("data/db/bluestock_mf.db")
-cursor = conn.cursor()
 
-cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-tables = cursor.fetchall()
+tables = pd.read_sql(
+    "SELECT name FROM sqlite_master WHERE type='table';",
+    conn
+)
 
-print("TABLE NAME → ROW COUNT\n")
-
-for table in tables:
-    table_name = table[0]
-
-    cursor.execute(f'SELECT COUNT(*) FROM "{table_name}"')
-    count = cursor.fetchone()[0]
-
-    print(f"{table_name} → {count}")
+for table in tables["name"]:
+    count = pd.read_sql(
+        f"SELECT COUNT(*) as cnt FROM '{table}'",
+        conn
+    )
+    print(table, ":", count["cnt"][0])
 
 conn.close()
